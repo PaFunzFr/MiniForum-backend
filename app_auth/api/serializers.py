@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from app_auth.models import forumUser
+from app_auth.models import ForumUser
 from django.contrib.auth import authenticate
 
 class RegisterSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = forumUser
+        model = ForumUser
         fields = ('id', 'username', 'email', 'password', 'repeated_password')
         extra_kwargs = {
             'password': {'write_only': True}
@@ -18,7 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         if pw != rpw:
             raise serializers.ValidationError({"password": "Passwords must match."})
         
-        account = forumUser(
+        account = ForumUser(
             username=self.validated_data['username'],
             email=self.validated_data['email']
         )
@@ -26,25 +26,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         account.save()
         return account
     
-class LoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = forumUser
-        fields = ('email', 'password')
-        # extra_kwargs to ensure password is write-only (password already default value of forumUser(User))
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+""" not needed, as we use DRF's built-in obtain_auth_token view for login"""    
+# class LoginSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        email = data.get('email')
-        password = data.get('password')
+#     def validate(self, data):
+#         email = data.get('email')
+#         password = data.get('password')
 
-        if email and password:
-            user = authenticate(email=email, password=password)
+#         if email and password:
+#             user = authenticate(email=email, password=password)
 
-            if not user or not user.is_active:
-                raise serializers.ValidationError("Invalid credentials or inactive user.")
-            data['user'] = user
-            return data
-        else:
-            raise serializers.ValidationError("Must include 'email' and 'password'.")
+#             if not user or not user.is_active:
+#                 raise serializers.ValidationError("Invalid credentials or inactive user.")
+#             data['user'] = user
+#             return data
+#         else:
+#             raise serializers.ValidationError("Must include 'email' and 'password'.")
