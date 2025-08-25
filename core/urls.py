@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('app_auth.api.urls')),
+    path('api/forum/', include('app_forum.api.urls')),
+    path('api-auth/', include('rest_framework.urls')),  # for browsable API login/logout
 ]
